@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D Developer Portfolio</title>
+  <!-- External Dependencies -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    const OrbitControls = THREE.OrbitControls;
+  </script>
+  <script src="https://unpkg.com/@react-spring/three@9.7.3/dist/react-spring-three.min.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/marked@5.1.2/marked.min.js"></script>
+  <style id="app-style">
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --primary: #0ff;
+      --secondary: #f0f;
+      --accent: #ff0;
+      --background: #050a14;
+      --surface: #0a1428;
+      --text: #e6e6e6;
+      --muted-text: #a0a0a0;
+    }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      margin: 0;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease;
+    }
+
+    .light-mode {
+      --primary: #0088ff;
+      --secondary: #cb00ff;
+      --accent: #ffcc00;
+      --background: #f5f5f5;
+      --surface: #ffffff;
+      --text: #212121;
+      --muted-text: #5a5a5a;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+    }
+
+    .neon-text {
+      text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary);
+    }
+
+    .neon-border {
+      box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary);
+    }
+
+    .glitch-effect {
+      position: relative;
+    }
+    
+    .glitch-effect::before, .glitch-effect::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      clip: rect(0, 0, 0, 0);
+    }
+    
+    .glitch-effect::before {
+      left: 2px;
+      text-shadow: -1px 0 var(--secondary);
+      animation: glitch-animation 3s infinite linear alternate-reverse;
+    }
+    
+    .glitch-effect::after {
+      left: -2px;
+      text-shadow: 2px 0 var(--accent);
+      animation: glitch-animation 2s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitch-animation {
+      0% {
+        clip: rect(30px, 9999px, 10px, 0);
+      }
+      10% {
+        clip: rect(54px, 9999px, 70px, 0);
+      }
+      20% {
+        clip: rect(58px, 9999px, 86px, 0);
+      }
+      30% {
+        clip: rect(11px, 9999px, 27px, 0);
+      }
+      40% {
+        clip: rect(88px, 9999px, 100px, 0);
+      }
+      50% {
+        clip: rect(67px, 9999px, 50px, 0);
+      }
+      60% {
+        clip: rect(24px, 9999px, 91px, 0);
+      }
+      70% {
+        clip: rect(4px, 9999px, 69px, 0);
+      }
+      80% {
+        clip: rect(16px, 9999px, 54px, 0);
+      }
+      90% {
+        clip: rect(33px, 9999px, 17px, 0);
+      }
+      100% {
+        clip: rect(76px, 9999px, 43px, 0);
+      }
+    }
+
+    .cyberpunk-grid {
+      position: relative;
+      padding: 2rem;
+      border: 2px solid var(--primary);
+      background: linear-gradient(135deg, rgba(10, 20, 40, 0.8) 0%, rgba(5, 10, 20, 0.9) 100%);
+      box-shadow: 0 0 10px var(--primary);
+    }
+
+    .cyberpunk-grid::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        linear-gradient(to right, var(--surface) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--surface) 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.1;
+      z-index: -1;
+    }
+
+    .scene-container {
+      position: relative;
+      height: 500px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      transition: width 0.3s ease;
+    }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--primary);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .project-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+    }
+
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .lightbox-content {
+      position: relative;
+      width: 80%;
+      height: 80%;
+      max-width: 1200px;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
+      color: var(--text);
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .btn-cyberpunk {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: var(--background);
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      border: none;
+      padding: 10px 20px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      transition: all 0.3s;
+      box-shadow: 0 0 10px var(--primary);
+    }
+
+    .btn-cyberpunk:hover {
+      color: var(--text);
+    }
+
+    .btn-cyberpunk:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: all 0.4s;
+      z-index: -1;
+    }
+
+    .btn-cyberpunk:hover:before {
+      left: 100%;
+    }
+
+    .nav-link {
+      position: relative;
+      text-decoration: none;
+      color: var(--text);
+      padding: 5px 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 80%;
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      color: var(--background);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 100;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+    }
+
+    .scroll-top:hover {
+      transform: translateY(-3px);
+    }
+
+    .slide-in-right {
+      animation: slideInRight 0.5s forwards;
+    }
+
+    .slide-in-left {
+      animation: slideInLeft 0.5s forwards;
+    }
+
+    .fade-in {
+      animation: fadeIn 1s forwards;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        transform: translateX(-100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(0, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Blog Section */
+    .blog-post {
+      background: var(--surface);
+      border-left: 4px solid var(--primary);
+      margin-bottom: 20px;
+      padding: 20px;
+      transition: transform 0.3s;
+    }
+
+    .blog-post:hover {
+      transform: translateX(5px);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--background);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary);
+    }
+    
+    /* Add this to the app-style block to reduce the gap above skills section */
+    @media screen and (min-width: 768px) {
+      #skills {
+        padding-top: 4rem; /* Reduced from default 16rem (py-16) */
+      }
+      
+      #about {
+        margin-bottom: -2rem; /* Negative margin to pull the skills section up */
+      }
+    }
+
+    /* Add media query to fix button conflict on small screens */
+    @media (max-width: 768px) {
+      /* Fix project filter buttons and upload button layout */
+      #projects .flex.justify-between.items-center {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      #projects .flex.space-x-2 {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      #projects .flex.space-x-2 .btn-filter {
+        margin-right: 0;
+        flex: 1 1 auto;
+        min-width: 45%;
+        margin-bottom: 0.5rem;
+        text-align: center;
+      }
+      
+      /* Make upload button full width on mobile */
+      #projects .btn-cyberpunk {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Header -->
+  <header class="fixed top-0 w-full bg-opacity-80 backdrop-blur-lg z-50 transition-all duration-300" id="header">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center">
+        <h1 class="text-3xl font-bold glitch-effect neon-text" data-text="DEV3D">DEV3D</h1>
+      </div>
+      <nav class="hidden md:flex space-x-6">
+        <a href="#about" class="nav-link">About</a>
+        <a href="#skills" class="nav-link">Skills</a>
+        <a href="#projects" class="nav-link">Projects</a>
+        <a href="#blog" class="nav-link">Blog</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <button id="theme-toggle" class="text-2xl hover:text-primary transition-colors">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="md:hidden text-2xl" id="mobile-menu-btn">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden bg-surface py-4 px-4 hidden">
+      <nav class="flex flex-col space-y-4">
+        <a href="#about" class="nav-link">About</a>
+        <a href="#skills" class="nav-link">Skills</a>
+        <a href="#projects" class="nav-link">Projects</a>
+        <a href="#blog" class="nav-link">Blog</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="pt-24">
+    <!-- Hero Section -->
+    <section class="py-24 relative overflow-hidden">
+      <div class="container mx-auto px-4 relative z-10">
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="slide-in-left">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 neon-text">
+              Creative <br>
+              <span class="text-primary">3D Developer</span> <br>
+              Portfolio
+            </h1>
+            <p class="text-xl mb-8">Bringing web development to life with cutting-edge 3D technology</p>
+            <div class="flex space-x-4">
+              <a href="#projects" class="btn-cyberpunk">View Projects</a>
+              <a href="#contact" class="border-2 border-primary px-6 py-2 hover:bg-primary hover:bg-opacity-20 transition-colors">Contact Me</a>
+            </div>
+          </div>
+          <div class="scene-container neon-border slide-in-right" id="hero-scene">
+            <!-- Three.js hero scene will be rendered here -->
+          </div>
+        </div>
+      </div>
+      <div class="absolute inset-0 bg-grid opacity-10"></div>
+    </section>
+
+    <section id="about" class="py-16 relative">
+  <div class="container mx-auto px-4">
+    <h2 class="text-4xl font-bold mb-12 text-center">About <span class="text-primary">Me</span></h2>
+    <div class="grid md:grid-cols-2 gap-8 items-center">
+      
+      <div class="scene-container neon-border relative overflow-hidden flex items-center justify-center">
+        <img 
+          src="https://cdn.pixabay.com/photo/2021/06/01/06/10/woman-6300665_640.png" 
+          alt="Cyberpunk Developer Avatar" 
+          class="w-full h-full object-cover opacity-80"
+          style="filter: hue-rotate(180deg) saturate(1.5);"
+        >
+        <div class="absolute inset-0 bg-primary opacity-10 mix-blend-screen"></div>
+      </div>
+      <div class="cyberpunk-grid">
+        <h3 class="text-2xl font-bold mb-4">3D Web Developer & Designer</h3>
+        <p class="mb-4">
+          Hello there! I'm a passionate frontend developer specializing in creating immersive web experiences using Three.js and WebGL. With over 5 years of experience, I blend cutting-edge technology with creative design to build memorable digital projects.
+        </p>
+        <p class="mb-6">
+          My expertise spans React, Three.js, WebGL, and modern web technologies. I'm dedicated to pushing the boundaries of what's possible on the web, creating performant 3D experiences that captivate users.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <span class="px-3 py-1 bg-primary bg-opacity-20 text-primary rounded-full text-sm">React</span>
+          <span class="px-3 py-1 bg-primary bg-opacity-20 text-primary rounded-full text-sm">Three.js</span>
+          <span class="px-3 py-1 bg-primary bg-opacity-20 text-primary rounded-full text-sm">WebGL</span>
+          <span class="px-3 py-1 bg-primary bg-opacity-20 text-primary rounded-full text-sm">JavaScript</span>
+          <span class="px-3 py-1 bg-primary bg-opacity-20 text-primary rounded-full text-sm">3D Modeling</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-16 relative bg-surface">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold mb-12 text-center">Technical <span class="text-primary">Skills</span></h2>
+        <div class="mb-12">
+          <div class="scene-container" id="skills-cloud-scene">
+            <!-- Three.js skills cloud will be rendered here -->
+          </div>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Frontend Skills -->
+          <div class="cyberpunk-grid">
+            <h3 class="text-xl font-bold mb-4 text-primary"><i class="fas fa-code mr-2"></i>Frontend</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>React</span>
+                  <span>95%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 95%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>Three.js</span>
+                  <span>90%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 90%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>HTML/CSS</span>
+                  <span>98%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 98%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>JavaScript</span>
+                  <span>92%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 92%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 3D Skills -->
+          <div class="cyberpunk-grid">
+            <h3 class="text-xl font-bold mb-4 text-secondary"><i class="fas fa-cube mr-2"></i>3D Development</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>WebGL</span>
+                  <span>85%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 85%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>GLSL Shaders</span>
+                  <span>80%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 80%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>Blender</span>
+                  <span>75%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 75%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>3D Animation</span>
+                  <span>82%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 82%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Additional Skills -->
+          <div class="cyberpunk-grid">
+            <h3 class="text-xl font-bold mb-4 text-accent"><i class="fas fa-tools mr-2"></i>Other Skills</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>Git/GitHub</span>
+                  <span>88%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 88%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>CI/CD</span>
+                  <span>78%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 78%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>Responsive Design</span>
+                  <span>96%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 96%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span>Performance Optimization</span>
+                  <span>87%</span>
+                </div>
+                <div class="h-1 w-full bg-gray-700">
+                  <div class="progress-bar" style="width: 87%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-16 relative">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold mb-12 text-center">Featured <span class="text-primary">Projects</span></h2>
+        
+        <div class="flex justify-between items-center mb-8">
+          <div class="flex space-x-2">
+            <button class="btn-filter active px-4 py-2 border border-primary" data-filter="all">All</button>
+            <button class="btn-filter px-4 py-2 border border-gray-600" data-filter="3d">3D Models</button>
+            <button class="btn-filter px-4 py-2 border border-gray-600" data-filter="web">Web Apps</button>
+            <button class="btn-filter px-4 py-2 border border-gray-600" data-filter="game">Games</button>
+          </div>
+          
+          <div>
+            <label class="btn-cyberpunk cursor-pointer">
+              <input type="file" id="model-upload" class="hidden" accept=".glb,.gltf">
+              <i class="fas fa-upload mr-2"></i> Upload Model
+            </label>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projects-grid">
+          <!-- Project cards will be generated here -->
+          <div class="project-card" data-category="3d">
+            <div class="h-48 bg-gray-800 relative overflow-hidden">
+              <img src="https://cdn.pixabay.com/photo/2015/05/28/23/11/ufo-788746_1280.jpg" alt="Space Explorer" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+              <div class="absolute bottom-0 left-0 p-4">
+                <h3 class="text-xl font-bold">Space Explorer</h3>
+                <p class="text-sm text-gray-300">Interactive 3D space station</p>
+              </div>
+            </div>
+            <div class="p-4">
+              <p class="mb-4 text-sm text-muted-text">A detailed 3D model of a futuristic space station with interactive elements and animations.</p>
+              <button class="view-project btn-cyberpunk text-sm py-1 px-4" data-model="space-explorer">View Model</button>
+            </div>
+          </div>
+          
+          <div class="project-card" data-category="web">
+            <div class="h-48 bg-gray-800 relative overflow-hidden">
+              <img src="https://media.istockphoto.com/id/1219854221/photo/web-design-development-and-coding-concept.webp?a=1&b=1&s=612x612&w=0&k=20&c=tSdOwHoZgBoIxaFBtKhl4g3fBD1U0--vK3j9hfylhCE=" alt="Portfolio Website" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+              <div class="absolute bottom-0 left-0 p-4">
+                <h3 class="text-xl font-bold">Portfolio Website</h3>
+                <p class="text-sm text-gray-300">React & Three.js</p>
+              </div>
+            </div>
+            <div class="p-4">
+              <p class="mb-4 text-sm text-muted-text">A personal portfolio website built with React and Three.js featuring interactive 3D elements.</p>
+              <button class="view-project btn-cyberpunk text-sm py-1 px-4" data-model="portfolio">View Model</button>
+            </div>
+          </div>
+          
+          <div class="project-card" data-category="game">
+            <div class="h-48 bg-gray-800 relative overflow-hidden">
+              <img src="https://cdn.pixabay.com/photo/2016/10/11/21/43/geometric-1732847_1280.jpg" alt="Cyber Racer" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+              <div class="absolute bottom-0 left-0 p-4">
+                <h3 class="text-xl font-bold">Cyber Racer</h3>
+                <p class="text-sm text-gray-300">WebGL Racing Game</p>
+              </div>
+            </div>
+            <div class="p-4">
+              <p class="mb-4 text-sm text-muted-text">A futuristic racing game built with Three.js and custom physics engine for the web.</p>
+              <button class="view-project btn-cyberpunk text-sm py-1 px-4" data-model="cyber-racer">View Model</button>
+            </div>
+          </div>
+          
+          <div class="project-card" data-category="3d">
+            <div class="h-48 bg-gray-800 relative overflow-hidden">
+              <img src="https://cdn.pixabay.com/photo/2024/10/10/15/26/cyberpunk-9111144_1280.jpg" alt="Neon City" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+              <div class="absolute bottom-0 left-0 p-4">
+                <h3 class="text-xl font-bold">Neon City</h3>
+                <p class="text-sm text-gray-300">Cyberpunk Environment</p>
+              </div>
+            </div>
+            <div class="p-4">
+              <p class="mb-4 text-sm text-muted-text">A detailed cyberpunk city environment with dynamic lighting and interactive elements.</p>
+              <button class="view-project btn-cyberpunk text-sm py-1 px-4" data-model="neon-city">View Model</button>
+            </div>
+          </div>
+          
+          <div class="project-card" data-category="web">
+            <div class="h-48 bg-gray-800 relative overflow-hidden">
+              <img src="https://cdn.pixabay.com/photo/2017/05/08/22/57/big-data-2296821_640.jpg" alt="Data Visualizer" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+              <div class="absolute bottom-0 left-0 p-4">
+                <h3 class="text-xl font-bold">Data Visualizer</h3>
+                <p class="text-sm text-gray-300">3D Charts & Graphs</p>
+              </div>
+            </div>
+            <div class="p-4">
+              <p class="mb-4 text-sm text-muted-text">An interactive data visualization tool that renders complex datasets as navigable 3D models.</p>
+              <button class="view-project btn-cyberpunk text-sm py-1 px-4" data-model="data-visualizer">View Model</button>
+            </div>
+          </div>
+          
+          <div class="project-card" data-category="game">
+            <div class="h-48 bg-gray-800 relative overflow-hidden">
+              <img src="https://cdn.pixabay.com/photo/2022/06/07/02/34/metaverse-7247267_640.jpg" alt="VR Experience" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+              <div class="absolute bottom-0 left-0 p-4">
+                <h3 class="text-xl font-bold">VR Experience</h3>
+                <p class="text-sm text-gray-300">WebXR Application</p>
+              </div>
+            </div>
+            <div class="p-4">
+              <p class="mb-4 text-sm text-muted-text">A virtual reality experience designed for web browsers with WebXR support.</p>
+              <button class="view-project btn-cyberpunk text-sm py-1 px-4" data-model="vr-experience">View Model</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Model Viewer Lightbox -->
+      <div id="model-lightbox" class="lightbox">
+        <div class="lightbox-content">
+          <span class="lightbox-close">&times;</span>
+          <div id="model-viewer" class="w-full h-full"></div>
+          <div class="absolute bottom-4 left-4 flex space-x-2">
+            <button id="rotate-model" class="btn-cyberpunk text-sm"><i class="fas fa-sync-alt mr-2"></i>Rotate</button>
+            <button id="zoom-in" class="btn-cyberpunk text-sm"><i class="fas fa-search-plus mr-2"></i>Zoom In</button>
+            <button id="zoom-out" class="btn-cyberpunk text-sm"><i class="fas fa-search-minus mr-2"></i>Zoom Out</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section id="blog" class="py-16 relative bg-surface">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold mb-12 text-center">Latest <span class="text-primary">Articles</span></h2>
+        
+        <div id="blog-posts" class="space-y-8">
+          <!-- Blog posts will be loaded here -->
+          <article class="blog-post">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-2xl font-bold">Creating Realistic 3D Environments with Three.js</h3>
+              <span class="text-sm text-muted-text">2025-03-15</span>
+            </div>
+            <p class="text-muted-text mb-4">Learn how to create immersive 3D environments that captivate users and provide interactive experiences.</p>
+            <div class="flex justify-between items-center">
+              <div class="flex space-x-2">
+                <span class="px-2 py-1 bg-primary bg-opacity-20 text-primary text-xs rounded-full">Three.js</span>
+                <span class="px-2 py-1 bg-primary bg-opacity-20 text-primary text-xs rounded-full">3D Design</span>
+              </div>
+              <button class="text-primary hover:underline">Read More</button>
+            </div>
+          </article>
+          
+          <article class="blog-post">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-2xl font-bold">Custom Shaders for WebGL: A Beginner's Guide</h3>
+              <span class="text-sm text-muted-text">2025-02-28</span>
+            </div>
+            <p class="text-muted-text mb-4">Dive into the world of GLSL shaders and learn how to create custom visual effects for your WebGL projects.</p>
+            <div class="flex justify-between items-center">
+              <div class="flex space-x-2">
+                <span class="px-2 py-1 bg-primary bg-opacity-20 text-primary text-xs rounded-full">GLSL</span>
+                <span class="px-2 py-1 bg-primary bg-opacity-20 text-primary text-xs rounded-full">WebGL</span>
+              </div>
+              <button class="text-primary hover:underline">Read More</button>
+            </div>
+          </article>
+          
+          <article class="blog-post">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-2xl font-bold">Optimizing 3D Models for Web Performance</h3>
+              <span class="text-sm text-muted-text">2025-02-10</span>
+            </div>
+            <p class="text-muted-text mb-4">Learn techniques to reduce polygon count, optimize textures, and improve the performance of 3D web applications.</p>
+            <div class="flex justify-between items-center">
+              <div class="flex space-x-2">
+                <span class="px-2 py-1 bg-primary bg-opacity-20 text-primary text-xs rounded-full">Performance</span>
+                <span class="px-2 py-1 bg-primary bg-opacity-20 text-primary text-xs rounded-full">3D Models</span>
+              </div>
+              <button class="text-primary hover:underline">Read More</button>
+            </div>
+          </article>
+        </div>
+        
+        <div class="text-center mt-8">
+          <button id="load-more-posts" class="btn-cyberpunk">
+            <span id="load-more-text">Load More</span>
+            <span id="loading-more" class="hidden">
+              <i class="fas fa-spinner fa-spin"></i> Loading...
+            </span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 relative">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold mb-12 text-center">Get In <span class="text-primary">Touch</span></h2>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="cyberpunk-grid">
+            <h3 class="text-2xl font-bold mb-6">Contact Information</h3>
+            <div class="space-y-4">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center text-primary mr-4">
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <div>
+                  <p class="text-muted-text text-sm">Email</p>
+                  <p>contact@dev3d.portfolio</p>
+                </div>
+              </div>
+              
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center text-primary mr-4">
+                  <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div>
+                  <p class="text-muted-text text-sm">Location</p>
+                  <p>Nairobi, KE</p>
+                </div>
+              </div>
+              
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center text-primary mr-4">
+                  <i class="fas fa-globe"></i>
+                </div>
+                <div>
+                  <p class="text-muted-text text-sm">Website</p>
+                  <p>www.dev3d.portfolio</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-8">
+              <h4 class="font-bold mb-4">Connect With Me</h4>
+              <div class="flex space-x-4">
+                <a href="www.github.com" class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center text-primary hover:bg-opacity-40 transition-colors">
+                  <i class="fab fa-github"></i>
+                </a>
+                <a href="www.linkedin.com" class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center text-primary hover:bg-opacity-40 transition-colors">
+                  <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="www.twiter.com" class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center text-primary hover:bg-opacity-40 transition-colors">
+                  <i class="fab fa-twitter"></i>
+                </a>
+                <a href="www.instagram" class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center text-primary hover:bg-opacity-40 transition-colors">
+                  <i class="fab fa-instagram"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="cyberpunk-grid">
+            <h3 class="text-2xl font-bold mb-6">Send Me a Message</h3>
+            <form id="contact-form" class="space-y-6">
+              <div>
+                <label for="name" class="block mb-2 text-sm font-medium">Name</label>
+                <input type="text" id="name" class="w-full p-3 bg-background border border-primary focus:ring-primary focus:border-primary" required>
+              </div>
+              
+              <div>
+                <label for="email" class="block mb-2 text-sm font-medium">Email</label>
+                <input type="email" id="email" class="w-full p-3 bg-background border border-primary focus:ring-primary focus:border-primary" required>
+              </div>
+              
+              <div>
+                <label for="subject" class="block mb-2 text-sm font-medium">Subject</label>
+                <input type="text" id="subject" class="w-full p-3 bg-background border border-primary focus:ring-primary focus:border-primary" required>
+              </div>
+              
+              <div>
+                <label for="message" class="block mb-2 text-sm font-medium">Message</label>
+                <textarea id="message" rows="4" class="w-full p-3 bg-background border border-primary focus:ring-primary focus:border-primary" required></textarea>
+              </div>
+              
+              <button type="submit" class="btn-cyberpunk w-full">
+                <span id="submit-text">Send Message</span>
+                <span id="submitting" class="hidden">
+                  <i class="fas fa-spinner fa-spin mr-2"></i> Sending...
+                </span>
+              </button>
+              
+              <div id="form-status" class="hidden p-4 border text-center"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-8 bg-surface">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <h3 class="text-xl font-bold neon-text">DEV3D</h3>
+          <p class="text-muted-text">Bringing web development to life with Three.js</p>
+        </div>
+        
+        <div class="flex space-x-6">
+          <a href="www.github.com" class="text-muted-text hover:text-primary transition-colors">
+            <i class="fab fa-github text-xl"></i>
+          </a>
+          <a href="www.linkedin.com" class="text-muted-text hover:text-primary transition-colors">
+            <i class="fab fa-linkedin text-xl"></i>
+          </a>
+          <a href="www.twitter.com" class="text-muted-text hover:text-primary transition-colors">
+            <i class="fab fa-twitter text-xl"></i>
+          </a>
+          <a href="www.instagram.com" class="text-muted-text hover:text-primary transition-colors">
+            <i class="fab fa-instagram text-xl"></i>
+          </a>
+        </div>
+      </div>
+      
+      <hr class="my-6 border-gray-700">
+      
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <p class="text-sm text-muted-text">&copy; 2025 M-tech-cmd. All rights reserved.</p>
+        <div class="flex space-x-4 mt-4 md:mt-0">
+          <a href="" class="text-sm text-muted-text hover:text-primary transition-colors">Privacy Policy</a>
+          <a href="" class="text-sm text-muted-text hover:text-primary transition-colors">Terms of Service</a>
+          <a href="" class="text-sm text-muted-text hover:text-primary transition-colors">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll to Top Button -->
+  <button id="scroll-top" class="scroll-top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script id="app-script">
+    document.addEventListener('DOMContentLoaded', function() {
+      // Theme Toggle
+      const themeToggle = document.getElementById('theme-toggle');
+      const body = document.body;
+      const icon = themeToggle.querySelector('i');
+      
+      // Load theme from localStorage
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      if (currentTheme === 'light') {
+        body.classList.add('light-mode');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      }
+      
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('light-mode');
+        
+        if (body.classList.contains('light-mode')) {
+          localStorage.setItem('theme', 'light');
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+        } else {
+          localStorage.setItem('theme', 'dark');
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+        }
+      });
+      
+      // Mobile Menu
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      mobileMenuBtn.addEventListener('click', function() {
+        mobileMenu.classList.toggle('hidden');
+        const icon = mobileMenuBtn.querySelector('i');
+        
+        if (mobileMenu.classList.contains('hidden')) {
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        } else {
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-times');
+        }
+      });
+      
+      // Navigation highlighting and smooth scrolling
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.nav-link');
+      
+      function highlightNavigation() {
+        const scrollY = window.scrollY;
+        
+        sections.forEach(section => {
+          const sectionHeight = section.offsetHeight;
+          const sectionTop = section.offsetTop - 100;
+          const sectionId = section.getAttribute('id');
+          
+          if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+            navLinks.forEach(link => {
+              link.classList.remove('active');
+              if (link.getAttribute('href') === `#${sectionId}`) {
+                link.classList.add('active');
+              }
+            });
+          }
+        });
+      }
+      
+      window.addEventListener('scroll', highlightNavigation);
+      
+      // Smooth scrolling
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          const targetId = this.getAttribute('href');
+          const targetSection = document.querySelector(targetId);
+          
+          window.scrollTo({
+            top: targetSection.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          
+          // Close mobile menu if open
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+          }
+        });
+      });
+      
+      // Scroll to top button
+      const scrollTopBtn = document.getElementById('scroll-top');
+      
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+          scrollTopBtn.classList.add('visible');
+        } else {
+          scrollTopBtn.classList.remove('visible');
+        }
+      });
+      
+      scrollTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+      
+      // Project Filtering
+      const filterButtons = document.querySelectorAll('.btn-filter');
+      const projectCards = document.querySelectorAll('.project-card');
+      
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const filterValue = this.getAttribute('data-filter');
+          
+          // Update active button
+          filterButtons.forEach(btn => btn.classList.remove('active', 'border-primary'));
+          this.classList.add('active', 'border-primary');
+          
+          // Filter projects
+          projectCards.forEach(card => {
+            if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+              card.style.display = 'block';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+      
+      // Model Viewer Lightbox
+      const viewProjectBtns = document.querySelectorAll('.view-project');
+      const modelLightbox = document.getElementById('model-lightbox');
+      const lightboxClose = document.querySelector('.lightbox-close');
+      const modelViewer = document.getElementById('model-viewer');
+      
+      viewProjectBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const modelId = this.getAttribute('data-model');
+          
+          // Show lightbox
+          modelLightbox.style.display = 'flex';
+          
+          // Initialize Three.js scene for the model
+          initModelViewer(modelId);
+          
+          // Track analytics event
+          trackEvent('model_view', { model_id: modelId });
+        });
+      });
+      
+      lightboxClose.addEventListener('click', function() {
+        modelLightbox.style.display = 'none';
+        // Clean up Three.js scene
+        cleanupModelViewer();
+      });
+      
+      // Model Upload
+      const modelUpload = document.getElementById('model-upload');
+      
+      modelUpload.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+          const file = e.target.files[0];
+          // In a real app, we would upload the file to a server
+          // For now, we'll just show a success message and create a placeholder project card
+          
+          // Create new project card for the uploaded model
+          createUploadedModelCard(file.name);
+          
+          // Track analytics event
+          trackEvent('model_upload', { file_name: file.name });
+        }
+      });
+      
+      // Contact Form
+      const contactForm = document.getElementById('contact-form');
+      const submitText = document.getElementById('submit-text');
+      const submitting = document.getElementById('submitting');
+      const formStatus = document.getElementById('form-status');
+      
+      contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Form validation
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('message').value.trim();
+        
+        if (!name || !email || !subject || !message) {
+          showFormStatus('error', 'Please fill in all fields');
+          return;
+        }
+        
+        if (!isValidEmail(email)) {
+          showFormStatus('error', 'Please enter a valid email address');
+          return;
+        }
+        
+        // Show loading indicator
+        submitText.classList.add('hidden');
+        submitting.classList.remove('hidden');
+        
+        // Simulate form submission (would be replaced by actual API call)
+        setTimeout(() => {
+          submitText.classList.remove('hidden');
+          submitting.classList.add('hidden');
+          
+          showFormStatus('success', 'Your message has been sent successfully!');
+          
+          // Reset form
+          contactForm.reset();
+          
+          // Track analytics event
+          trackEvent('form_submit', { type: 'contact' });
+        }, 1500);
+      });
+      
+      function showFormStatus(type, message) {
+        formStatus.classList.remove('hidden', 'border-red-500', 'border-green-500', 'text-red-500', 'text-green-500', 'bg-red-50', 'bg-green-50');
+        
+        if (type === 'error') {
+          formStatus.classList.add('border-red-500', 'text-red-500', 'bg-red-50');
+        } else {
+          formStatus.classList.add('border-green-500', 'text-green-500', 'bg-green-50');
+        }
+        
+        formStatus.textContent = message;
+        
+        // Hide status after 5 seconds
+        setTimeout(() => {
+          formStatus.classList.add('hidden');
+        }, 5000);
+      }
+      
+      function isValidEmail(email) {
+        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+      }
+      
+      // Load More Blog Posts
+      const loadMoreBtn = document.getElementById('load-more-posts');
+      const loadMoreText = document.getElementById('load-more-text');
+      const loadingMore = document.getElementById('loading-more');
+      const blogPosts = document.getElementById('blog-posts');
+      let currentPage = 1;
+      
+      loadMoreBtn.addEventListener('click', function() {
+        loadMoreText.classList.add('hidden');
+        loadingMore.classList.remove('hidden');
+        
+        // Simulate loading more posts
+        setTimeout(() => {
+          loadMoreText.classList.remove('hidden');
+          loadingMore.classList.add('hidden');
+          
+          if (currentPage < 3) {
+            // Add more blog posts
+            for (let i = 0; i < 3; i++) {
+              blogPosts.appendChild(createBlogPost());
+            }
+            
+            currentPage++;
+            
+            // Track analytics event
+            trackEvent('load_more_posts', { page: currentPage });
+          } else {
+            // No more posts to load
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.classList.add('opacity-50');
+            loadMoreText.textContent = 'No More Posts';
+          }
+        }, 1500);
+      });
+      
+      // Initialize Three.js scenes
+      initializeThreeJs();
+      
+      // Intersection Observer for animations
+      const observerOptions = {
+        threshold: 0.1
+      };
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('fade-in');
+            
+            // Track section view
+            const sectionId = entry.target.id;
+            if (sectionId) {
+              trackEvent('section_view', { section: sectionId });
+            }
+            
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+      
+      sections.forEach(section => {
+        observer.observe(section);
+      });
+      
+      // Sticky Header
+      const header = document.getElementById('header');
+      let lastScrollY = window.scrollY;
+      
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+          header.classList.add('bg-background', 'shadow-lg');
+        } else {
+          header.classList.remove('bg-background', 'shadow-lg');
+        }
+        
+        if (window.scrollY > 300) {
+          if (window.scrollY > lastScrollY) {
+            // Scrolling down
+            header.style.transform = 'translateY(-100%)';
+          } else {
+            // Scrolling up
+            header.style.transform = 'translateY(0)';
+          }
+        }
+        
+        lastScrollY = window.scrollY;
+      });
+      
+      // Helper Functions
+      function createBlogPost() {
+        const article = document.createElement('article');
+        article.className = 'blog-post';
+        
+        // Generate random blog post content
+        const titles = [
+          'Implementing Physics in Three.js Games',
+          'Advanced Camera Controls for 3D Web Apps',
+          'Creating Procedural Textures with GLSL',
+          'Building a WebXR Portfolio Experience',
+          'Using React with Three.js: Best Practices'
+        ];
+        
+        const tags = [
+          ['Three.js', 'Game Development'],
+          ['Camera', '3D Controls'],
+          ['GLSL', 'Shaders'],
+          ['WebXR', 'Virtual Reality'],
+          ['React', 'Three.js']
+        ];
+        
+        const randomIndex = Math.floor(Math.random() * titles.length);
+        const randomDate = new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1);
+        const formattedDate = randomDate.toISOString().split('T')[0];
+        
+        article.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-2xl font-bold">${titles[randomIndex]}</h3>
+            <span class="text-sm text-muted-text">${formattedDate}</span>
+          </div>
+          <p class="text-muted-text mb-4">This is a prototype blog post. In the full version, this would contain a summary of the article content.</p>
+          <div class="flex justify-between items-center">
+            <div class="flex space-x-2">
+              <span class="px-2 py-1 bg-primary bg-opacity-20 text-primary text-xs rounded-full">${tags[randomIndex][0]}</span>
+              <span class="px-2 py-1 bg-primary bg-opacity-20 text-primary text-xs rounded-full">${tags[randomIndex][1]}</span>
+            </div>
+            <button class="text-primary hover:underline">Read More</button>
+          </div>
+        `;
+        
+        return article;
+      }
+      
+      function createUploadedModelCard(filename) {
+        const projectsGrid = document.getElementById('projects-grid');
+        
+        const div = document.createElement('div');
+        div.className = 'project-card';
+        div.setAttribute('data-category', 'uploaded');
+        
+        div.innerHTML = `
+          <div class="h-48 bg-gray-800 relative overflow-hidden">
+            <div class="flex items-center justify-center h-full">
+              <i class="fas fa-cube text-6xl text-primary"></i>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+            <div class="absolute bottom-0 left-0 p-4">
+              <h3 class="text-xl font-bold">${filename.split('.')[0]}</h3>
+              <p class="text-sm text-gray-300">Uploaded Model</p>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="mb-4 text-sm text-muted-text">Your uploaded 3D model. Click the button below to view and interact with it.</p>
+            <button class="view-project btn-cyberpunk text-sm py-1 px-4" data-model="uploaded">View Model</button>
+          </div>
+        `;
+        
+        projectsGrid.prepend(div);
+        
+        // Add event listener to the new button
+        const newButton = div.querySelector('.view-project');
+        newButton.addEventListener('click', function() {
+          modelLightbox.style.display = 'flex';
+          initModelViewer('uploaded');
+          
+          // Track analytics event
+          trackEvent('model_view', { model_id: 'uploaded' });
+        });
+      }
+      
+      // Analytics tracking
+      function trackEvent(eventName, eventData) {
+        // In a real app, this would send data to an analytics service
+        console.log(`[Analytics] Event: ${eventName}`, eventData);
+      }
+      
+      // Three.js Functions
+      function initializeThreeJs() {
+        // Hero Scene
+        initHeroScene();
+        
+        // Avatar Scene
+        initAvatarScene();
+        
+        // Skills Cloud Scene
+        initSkillsCloudScene();
+      }
+      
+      function initHeroScene() {
+        const container = document.getElementById('hero-scene');
+        if (!container) return;
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+        
+        // Create geometric shapes for a futuristic scene
+        const geometry = new THREE.TorusKnotGeometry(3, 1, 100, 16);
+        const material = new THREE.MeshStandardMaterial({ 
+          color: 0x00ffff,
+          wireframe: true,
+          emissive: 0x00ffff,
+          emissiveIntensity: 0.5
+        });
+        
+        const torusKnot = new THREE.Mesh(geometry, material);
+        scene.add(torusKnot);
+        
+        // Add particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCnt = 5000;
+        const posArray = new Float32Array(particlesCnt * 3);
+        
+        for (let i = 0; i < particlesCnt * 3; i++) {
+          posArray[i] = (Math.random() - 0.5) * 15;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+          size: 0.05,
+          color: 0xffffff
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const pointLight = new THREE.PointLight(0x00ffff, 1);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+        
+        camera.position.z = 10;
+        
+        // Animation
+        function animate() {
+          requestAnimationFrame(animate);
+          
+          torusKnot.rotation.x += 0.01;
+          torusKnot.rotation.y += 0.01;
+          
+          particlesMesh.rotation.y += 0.001;
+          
+          renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+      }
+      
+      function initAvatarScene() {
+        const container = document.getElementById('avatar-scene');
+        if (!container) return;
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+        
+        // Create a simple avatar
+        const head = new THREE.Mesh(
+          new THREE.SphereGeometry(1, 32, 32),
+          new THREE.MeshStandardMaterial({ color: 0x00ffff })
+        );
+        scene.add(head);
+        
+        const body = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.5, 0.8, 3, 32),
+          new THREE.MeshStandardMaterial({ color: 0xffffff })
+        );
+        body.position.y = -2;
+        scene.add(body);
+        
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const pointLight = new THREE.PointLight(0x00ffff, 1);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+        
+        camera.position.z = 5;
+        
+        // Controls for interactivity
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false;
+        
+        // Animation
+        function animate() {
+          requestAnimationFrame(animate);
+          
+          head.rotation.y += 0.01;
+          
+          controls.update();
+          renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+      }
+      
+      function initSkillsCloudScene() {
+        const container = document.getElementById('skills-cloud-scene');
+        if (!container) return;
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+        
+        // Create skill spheres
+        const skills = [
+          { name: 'HTML', color: 0xe34c26, size: 0.5, position: [1, 0, 2] },
+          { name: 'CSS', color: 0x264de4, size: 0.5, position: [-1, 0.5, 1] },
+          { name: 'JavaScript', color: 0xf0db4f, size: 0.6, position: [2, -1, 0] },
+          { name: 'React', color: 0x61dafb, size: 0.7, position: [-2, -0.5, -1] },
+          { name: 'Three.js', color: 0x00ffff, size: 0.8, position: [0, 1, -2] },
+          { name: 'WebGL', color: 0xff0000, size: 0.6, position: [1, -1, -2] },
+          { name: 'GLSL', color: 0x8400ff, size: 0.5, position: [-1, -1, -1] },
+          { name: 'Blender', color: 0xff7f00, size: 0.4, position: [2, 1, -1] },
+          { name: 'Git', color: 0xf34f29, size: 0.5, position: [-2, 1, 1] }
+        ];
+        
+        const skillObjects = [];
+        
+        skills.forEach(skill => {
+          const geometry = new THREE.SphereGeometry(skill.size, 32, 32);
+          const material = new THREE.MeshStandardMaterial({ 
+            color: skill.color,
+            emissive: skill.color,
+            emissiveIntensity: 0.3
+          });
+          
+          const sphere = new THREE.Mesh(geometry, material);
+          sphere.position.set(...skill.position);
+          scene.add(sphere);
+          
+          // Add label (in a real app, this would use HTML/CSS for better text rendering)
+          skillObjects.push({
+            mesh: sphere,
+            name: skill.name,
+            initialPosition: [...skill.position]
+          });
+        });
+        
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+        
+        camera.position.z = 5;
+        
+        // Animation
+        let time = 0;
+        function animate() {
+          requestAnimationFrame(animate);
+          
+          time += 0.01;
+          
+          skillObjects.forEach(skill => {
+            const [x, y, z] = skill.initialPosition;
+            skill.mesh.position.x = x + Math.sin(time + x) * 0.3;
+            skill.mesh.position.y = y + Math.cos(time + y) * 0.3;
+            skill.mesh.position.z = z + Math.sin(time + z) * 0.3;
+            skill.mesh.rotation.y += 0.01;
+          });
+          
+          renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+      }
+      
+      function initModelViewer(modelId) {
+        const container = document.getElementById('model-viewer');
+        if (!container) return;
+        
+        // Clear previous content
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+        
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050a14);
+        
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+        
+        // Default geometry
+        let object;
+        
+        // For a real app, we would load actual GLTF models here
+        switch (modelId) {
+          case 'space-explorer':
+            object = new THREE.Mesh(
+              new THREE.TorusKnotGeometry(2, 0.5, 100, 16),
+              new THREE.MeshStandardMaterial({ color: 0x00ffff, wireframe: false })
+            );
+            break;
+          case 'portfolio':
+            object = new THREE.Group();
+            const cube = new THREE.Mesh(
+              new THREE.BoxGeometry(1, 1, 1),
+              new THREE.MeshStandardMaterial({ color: 0x00ffff })
+            );
+            const sphere = new THREE.Mesh(
+              new THREE.SphereGeometry(0.5, 32, 32),
+              new THREE.MeshStandardMaterial({ color: 0xffffff })
+            );
+            sphere.position.set(2, 0, 0);
+            object.add(cube);
+            object.add(sphere);
+            break;
+          case 'cyber-racer':
+            object = new THREE.Mesh(
+              new THREE.ConeGeometry(1, 2, 32),
+              new THREE.MeshStandardMaterial({ color: 0xff00ff })
+            );
+            break;
+          case 'neon-city':
+            object = new THREE.Group();
+            for (let i = 0; i < 10; i++) {
+              const height = 1 + Math.random() * 4;
+              const building = new THREE.Mesh(
+                new THREE.BoxGeometry(1, height, 1),
+                new THREE.MeshStandardMaterial({ color: 0x0088ff })
+              );
+              building.position.set(
+                (Math.random() - 0.5) * 10,
+                height / 2,
+                (Math.random() - 0.5) * 10
+              );
+              object.add(building);
+            }
+            break;
+          case 'data-visualizer':
+            object = new THREE.Group();
+            for (let i = 0; i < 10; i++) {
+              const height = Math.random() * 3;
+              const bar = new THREE.Mesh(
+                new THREE.BoxGeometry(0.5, height, 0.5),
+                new THREE.MeshStandardMaterial({ color: 0x00ffff })
+              );
+              bar.position.set(i - 5, height / 2, 0);
+              object.add(bar);
+            }
+            break;
+          case 'vr-experience':
+            object = new THREE.Group();
+            const sphere1 = new THREE.Mesh(
+              new THREE.SphereGeometry(1, 32, 32),
+              new THREE.MeshStandardMaterial({ color: 0xff00ff })
+            );
+            const sphere2 = new THREE.Mesh(
+              new THREE.SphereGeometry(0.5, 32, 32),
+              new THREE.MeshStandardMaterial({ color: 0x00ffff })
+            );
+            sphere2.position.set(0, 0, 2);
+            object.add(sphere1);
+            object.add(sphere2);
+            break;
+          case 'uploaded':
+            object = new THREE.Mesh(
+              new THREE.OctahedronGeometry(1.5, 0),
+              new THREE.MeshStandardMaterial({ color: 0xffff00, wireframe: true })
+            );
+            break;
+          default:
+            object = new THREE.Mesh(
+              new THREE.SphereGeometry(1, 32, 32),
+              new THREE.MeshStandardMaterial({ color: 0x00ffff })
+            );
+        }
+        
+        scene.add(object);
+        
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+        
+        camera.position.z = 5;
+        
+        // Controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        
+        // Control buttons
+        const rotateBtn = document.getElementById('rotate-model');
+        let autoRotate = false;
+        
+        rotateBtn.addEventListener('click', () => {
+          autoRotate = !autoRotate;
+          rotateBtn.innerHTML = autoRotate ? 
+            '<i class="fas fa-pause mr-2"></i>Stop' : 
+            '<i class="fas fa-sync-alt mr-2"></i>Rotate';
+        });
+        
+        const zoomInBtn = document.getElementById('zoom-in');
+        zoomInBtn.addEventListener('click', () => {
+          camera.position.z -= 0.5;
+        });
+        
+        const zoomOutBtn = document.getElementById('zoom-out');
+        zoomOutBtn.addEventListener('click', () => {
+          camera.position.z += 0.5;
+        });
+        
+        // Animation
+        function animate() {
+          requestAnimationFrame(animate);
+          
+          if (autoRotate) {
+            object.rotation.y += 0.01;
+          }
+          
+          controls.update();
+          renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle resize
+        const handleResize = () => {
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(container.clientWidth, container.clientHeight);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        
+        // Store cleanup function
+        container._cleanup = () => {
+          window.removeEventListener('resize', handleResize);
+          renderer.dispose();
+        };
+      }
+      
+      function cleanupModelViewer() {
+        const container = document.getElementById('model-viewer');
+        if (container && container._cleanup) {
+          container._cleanup();
+        }
+      }
+    });
+  </script>
+</initial_code>
+</body>
+</html>
