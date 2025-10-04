@@ -1,86 +1,64 @@
-DEV3D - The Cyberpunk 3D Developer Portfolio
-🌐 Overview
-Welcome to DEV3D, a highly specialized portfolio dedicated to showcasing expertise in immersive 3D web development. Built with modern JavaScript and Three.js, this platform serves as an interactive demonstration of modern web capabilities, blending a dark, cyberpunk aesthetic with cutting-edge graphics performance.
+# DEV3D - The Cyberpunk 3D Developer Portfolio ⚡🕶️
 
-This portfolio is designed to be a memorable introduction to my skills as a 3D Web Developer, focusing on performant, visually stunning, and highly engaging digital experiences that run directly in the browser.
+## 🌐 Overview
 
-✨ Features
-Cyberpunk Aesthetic: A consistent, dark theme featuring neon borders and grid patterns, providing a unique and professional presentation.
+Welcome to **DEV3D**, a highly specialized portfolio dedicated to showcasing expertise in immersive **3D web development**. Built with modern **JavaScript** and **Three.js**, this platform demonstrates interactive, high-performance web capabilities. Designed with a **cyberpunk aesthetic**, it blends dark themes, neon borders, and futuristic design to create a visually striking developer showcase.
 
-Three.js Integration: Dedicated sections designed to host and display live 3D models and interactive scenes.
+This portfolio serves as a unique introduction to my skills as a **3D Web Developer**, emphasizing **performance**, **visual engagement**, and **cutting-edge browser-based experiences**.
 
-Specialized Project Showcase: Highlights a variety of 3D-centric projects, ranging from space exploration models and racing games to data visualization and VR experiences.
+---
 
-Fully Responsive Design: Optimized for seamless viewing and interaction across desktop, tablet, and mobile devices using Tailwind CSS.
+## ✨ Features
 
-Clean JavaScript Architecture: Built using clean, modular JavaScript for organization and performance.
+* 🌌 **Cyberpunk Aesthetic** – Dark theme, neon borders, and grid patterns for a futuristic vibe
+* 🎨 **Three.js Integration** – Display and interact with live 3D models and scenes
+* 🚀 **Specialized Project Showcase** – Space models, racing games, VR apps, and more
+* 📱 **Responsive Design** – Optimized for desktop, tablet, and mobile with Tailwind CSS
+* 🧩 **Clean JavaScript Architecture** – Modular ES6+ code for performance and maintainability
 
-🛠 Technology Stack
-This project leverages the following core technologies:
+---
 
-3D Graphics: Three.js / WebGL
+## 🛠 Technology Stack
 
-Styling: Tailwind CSS (for rapid, responsive utility-first styling)
+* **3D Graphics:** Three.js / WebGL
+* **Styling:** Tailwind CSS
+* **Language:** JavaScript (ES6+)
+* **Structure:** Pure HTML, CSS, and JavaScript (no build tools required)
 
-Language: JavaScript (ES6+)
+---
 
-Structure: Pure HTML/CSS/JavaScript (No build tools required)
+## 🚀 Projects Highlight
 
-🚀 Projects Highlight
-The Projects section features a curated list of specialized 3D applications:
+| Project             | Technology Focus                | Description                                        |
+| ------------------- | ------------------------------- | -------------------------------------------------- |
+| **Space Explorer**  | Three.js, Interactive Models    | Futuristic space station with interactive elements |
+| **Cyber Racer**     | Three.js, Custom Physics Engine | Neon racing game with physics simulation           |
+| **Neon City**       | Three.js, Environment Design    | Cyberpunk city with dynamic lighting               |
+| **Data Visualizer** | Three.js, D3                    | Render complex datasets as responsive 3D visuals   |
+| **VR Experience**   | WebXR Support                   | Browser-based VR experience with WebXR             |
 
-Project Name
+---
 
-Technology Focus
+## ⚙️ Installation and Setup
 
-Description
+This is a **static HTML/CSS/JavaScript project** that runs directly in modern browsers – no Node.js required.
 
-Space Explorer
+### Run Locally:
 
-Three.js, Interactive Models
+1. **Download Source:** Get the repo (ZIP or clone).
+2. **Open File:** Open `index.html` directly in your browser.
 
-A detailed 3D model of a futuristic space station with interactive elements.
+Alternatively, run via a local server (like VS Code Live Server):
 
-Cyber Racer
+```bash
+# Start local server in root directory
+http://127.0.0.1:5500/
+```
 
-Three.js, Custom Physics Engine
+---
 
-A futuristic arcade racing game built with Three.js and a custom physics engine for the web.
+## 📄 License
 
-Neon City
+This project is licensed under the **MIT License**.
 
-Three.js, Environment Design
-
-A detailed cyberpunk city environment with dynamic lighting and interactive elements.
-
-Data Visualizer
-
-Three.js, D3 (Inferred)
-
-An interactive data visualization tool that renders complex datasets as responsive 3D models.
-
-VR Experience
-
-WebXR Support
-
-A virtual reality application designed for web browsers with WebXR support.
-
-⚙️ Installation and Setup
-This is a static HTML, CSS, and JavaScript project designed to run directly in any modern web browser without any Node.js dependencies (npm).
-
-To run this portfolio locally, follow these simple steps:
-
-Download the Source:
-Download the project files (e.g., as a ZIP archive) from the repository.
-
-Open the File:
-Locate the main file (usually index.html) in the downloaded folder and open it directly in your web browser.
-
-Alternatively, if using a local development server (like VS Code's Live Server):
-
-Start the Local Server: Launch your preferred local server within the project's root directory.
-
-View in browser: Open your browser and navigate to the server's address (e.g., http://127.0.0.1:5500/).
-
-📄 License
-This project is open-sourced under the MIT License.
+---
