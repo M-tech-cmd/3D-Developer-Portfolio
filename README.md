@@ -72,3 +72,5 @@ This project is licensed under the **MIT License**.
 
 ![image alt](https://github.com/M-tech-cmd/3D-Developer-Portfolio/blob/fc430a14ddceb5b9c0dce9ea09f1c8a0f292705b/WhatsApp%20Image%202025-10-04%20at%2020.04.10_7c6b60be.jpg)
 
+![image alt](https://github.com/M-tech-cmd/3D-Developer-Portfolio/blob/8ddc988a3c4a7a07e88da6ec6b7839d06fc1ce27/WhatsApp%20Image%202025-10-04%20at%2020.04.52_33549bbc.jpg)
+
